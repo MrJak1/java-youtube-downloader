@@ -75,17 +75,17 @@ public class ParserImpl implements Parser {
 
         String body =
                 "{" +
-                "  \"videoId\": \"" + videoId + "\"," +
-                "  \"context\": {" +
-                "    \"client\": {" +
-                "      \"hl\": \"en\"," +
-                "      \"gl\": \"US\"," +
-                "      \"clientName\": \"ANDROID_TESTSUITE\"," +
-                "      \"clientVersion\": \"1.9\"," +
-                "      \"androidSdkVersion\": 31" +
-                "    }" +
-                "  }" +
-                "}";
+                        "  \"videoId\": \"" + videoId + "\"," +
+                        "  \"context\": {" +
+                        "    \"client\": {" +
+                        "      \"hl\": \"en\"," +
+                        "      \"gl\": \"US\"," +
+                        "      \"clientName\": \"ANDROID_TESTSUITE\"," +
+                        "      \"clientVersion\": \"1.9\"," +
+                        "      \"androidSdkVersion\": 31" +
+                        "    }" +
+                        "  }" +
+                        "}";
 
         RequestWebpage request = new RequestWebpage(url, "POST", body)
                 .header("Content-Type", "application/json");
@@ -708,7 +708,7 @@ public class ParserImpl implements Parser {
         }
 
         String html = response.data();
-        
+
         JSONObject initialData = extractor.extractInitialDataFromHtml(html);
         JSONArray rootContents;
         try {
@@ -720,7 +720,7 @@ public class ParserImpl implements Parser {
         } catch (NullPointerException e) {
             throw new YoutubeException.BadPageException("Search result root contents not found");
         }
-        
+
         long estimatedCount = extractor.extractLongFromText(initialData.getString("estimatedResults"));
         String clientVersion = extractor.extractClientVersionFromContext(initialData.getJSONObject("responseContext"));
         SearchContinuation continuation = getSearchContinuation(rootContents, clientVersion);
@@ -771,7 +771,7 @@ public class ParserImpl implements Parser {
         } catch (Exception e) {
             throw new YoutubeException.BadPageException("Could not parse search continuation json");
         }
-        
+
         long estimatedResults = extractor.extractLongFromText(jsonResponse.getString("estimatedResults"));
         SearchContinuation nextContinuation = getSearchContinuation(rootContents, continuation.clientVersion());
         return parseSearchResult(estimatedResults, rootContents, nextContinuation);
@@ -826,26 +826,24 @@ public class ParserImpl implements Parser {
         String rendererKey = jsonItem.keySet().iterator().next();
         JSONObject jsonRenderer = jsonItem.getJSONObject(rendererKey);
         switch (rendererKey) {
-        case "videoRenderer":
-            return new SearchResultVideoDetails(jsonRenderer, false);
-        case "movieRenderer":
-            return new SearchResultVideoDetails(jsonRenderer, true);
-        case "playlistRenderer":
-            return new SearchResultPlaylistDetails(jsonRenderer);
-        case "channelRenderer":
-            return new SearchResultChannelDetails(jsonRenderer);
-        case "shelfRenderer":
-            return new SearchResultShelf(jsonRenderer);
-        case "showingResultsForRenderer":
-            return new QueryAutoCorrection(jsonRenderer);
-        case "didYouMeanRenderer":
-            return new QuerySuggestion(jsonRenderer);
-        case "horizontalCardListRenderer":
-            return new QueryRefinementList(jsonRenderer);
-       default:
-           System.out.println("Unknown search result element type " + rendererKey);
-           System.out.println(jsonItem);
-           return null;
+            case "videoRenderer":
+                return new SearchResultVideoDetails(jsonRenderer, false);
+            case "movieRenderer":
+                return new SearchResultVideoDetails(jsonRenderer, true);
+            case "playlistRenderer":
+                return new SearchResultPlaylistDetails(jsonRenderer);
+            case "channelRenderer":
+                return new SearchResultChannelDetails(jsonRenderer);
+            case "shelfRenderer":
+                return new SearchResultShelf(jsonRenderer);
+            case "showingResultsForRenderer":
+                return new QueryAutoCorrection(jsonRenderer);
+            case "didYouMeanRenderer":
+                return new QuerySuggestion(jsonRenderer);
+            case "horizontalCardListRenderer":
+                return new QueryRefinementList(jsonRenderer);
+            default:
+                return null;
         }
     }
 }
